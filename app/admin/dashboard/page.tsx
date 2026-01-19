@@ -9,6 +9,14 @@ interface LeagueStats {
   playerCount: number
 }
 
+interface TeamPlayer {
+  id: string
+  team_id: string
+  waiver_signed: boolean
+  lunch_choice: string | null
+  teams: { league_id: string } | null
+}
+
 interface DashboardStats {
   totalTeams: number
   totalPlayers: number
@@ -38,6 +46,7 @@ async function getDashboardStats(): Promise<DashboardStats> {
   const { data: teamPlayers } = await supabase
     .from('team_players')
     .select('id, team_id, waiver_signed, lunch_choice, teams(league_id)')
+    .returns<TeamPlayer[]>()
 
   const totalTeams = teams?.length || 0
   const totalPlayers = teamPlayers?.length || 0
