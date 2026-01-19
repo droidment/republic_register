@@ -25,6 +25,7 @@ export default function NewTeamPage() {
         .from('leagues')
         .select('*')
         .order('name')
+        .returns<League[]>()
 
       if (data) {
         setLeagues(data)

@@ -35,6 +35,7 @@ interface DashboardStats {
   waiversCompleted: number
   lunchVeg: number
   lunchNonVeg: number
+  lunchNone: number
   lunchPending: number
   leagueStats: LeagueStats[]
 }
