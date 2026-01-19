@@ -17,14 +17,14 @@ export default function CaptainLoginPage() {
 
     const supabase = createClient()
 
-    // Check if this email belongs to a captain
-    const { data: team } = await supabase
+    // Check if this email belongs to a captain (may have multiple teams)
+    const { data: teams } = await supabase
       .from('teams')
       .select('id')
       .eq('captain_email', email.toLowerCase())
-      .single()
+      .limit(1)
 
-    if (!team) {
+    if (!teams || teams.length === 0) {
       setError('No team found for this email. Please contact the tournament organizer or check that you used the correct email.')
       setLoading(false)
       return
