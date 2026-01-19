@@ -9,6 +9,17 @@ interface LeagueStats {
   playerCount: number
 }
 
+interface League {
+  id: string
+  name: string
+  slug: string
+}
+
+interface Team {
+  id: string
+  league_id: string
+}
+
 interface TeamPlayer {
   id: string
   team_id: string
@@ -36,11 +47,13 @@ async function getDashboardStats(): Promise<DashboardStats> {
     .from('leagues')
     .select('id, name, slug')
     .order('name')
+    .returns<League[]>()
 
   // Get teams count by league
   const { data: teams } = await supabase
     .from('teams')
     .select('id, league_id')
+    .returns<Team[]>()
 
   // Get all team_players with details
   const { data: teamPlayers } = await supabase
