@@ -52,22 +52,42 @@ export default function PlayerActions({
     setLoading(true)
     setError(null)
 
-    const supabase = createClient()
+    try {
+      const supabase = createClient()
 
-    const { error: deleteError } = await supabase
-      .from('team_players')
-      .delete()
-      .eq('id', teamPlayerId)
+      // First verify the record exists
+      const { data: existing } = await supabase
+        .from('team_players')
+        .select('id')
+        .eq('id', teamPlayerId)
+        .single()
 
-    if (deleteError) {
-      setError(deleteError.message)
+      if (!existing) {
+        setError('Player record not found. Please refresh the page.')
+        setLoading(false)
+        return
+      }
+
+      const { error: deleteError } = await supabase
+        .from('team_players')
+        .delete()
+        .eq('id', teamPlayerId)
+
+      if (deleteError) {
+        console.error('Delete error:', deleteError)
+        setError(deleteError.message || 'Failed to remove player. Please try again.')
+        setLoading(false)
+        return
+      }
+
+      setShowRemoveModal(false)
       setLoading(false)
-      return
+      router.refresh()
+    } catch (err) {
+      console.error('Unexpected error:', err)
+      setError('An unexpected error occurred. Please try again.')
+      setLoading(false)
     }
-
-    setShowRemoveModal(false)
-    setLoading(false)
-    router.refresh()
   }
 
   return (
