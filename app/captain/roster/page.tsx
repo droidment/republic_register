@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { formatPhone, formatDateTime } from '@/lib/utils'
+import { formatPhone } from '@/lib/utils'
 import AddPlayerForm from './AddPlayerForm'
+import PlayerActions from './PlayerActions'
 
 interface TeamWithPlayers {
   id: string
@@ -118,16 +119,16 @@ export default async function RosterPage() {
             {team.team_players.map((tp) => (
               <div key={tp.id} className="px-6 py-4 hover:bg-gray-50">
                 <div className="flex items-center justify-between">
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-gray-900">{tp.players.name}</h3>
-                    <div className="mt-1 text-sm text-gray-500 space-x-4">
+                    <div className="mt-1 text-sm text-gray-500 flex flex-wrap gap-x-4 gap-y-1">
                       <span>{formatPhone(tp.players.phone)}</span>
-                      <span>{tp.players.email}</span>
+                      <span className="truncate">{tp.players.email}</span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 ml-4">
                     {/* Waiver Status */}
-                    <div className="text-center">
+                    <div className="text-center hidden sm:block">
                       {tp.waiver_signed ? (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                           Waiver Signed
@@ -139,7 +140,7 @@ export default async function RosterPage() {
                       )}
                     </div>
                     {/* Lunch Status */}
-                    <div className="text-center">
+                    <div className="text-center hidden sm:block">
                       {tp.lunch_choice ? (
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           tp.lunch_choice === 'veg'
@@ -156,7 +157,41 @@ export default async function RosterPage() {
                         </span>
                       )}
                     </div>
+                    {/* Player Actions */}
+                    <PlayerActions
+                      teamPlayerId={tp.id}
+                      playerId={tp.players.id}
+                      playerName={tp.players.name}
+                      playerPhone={tp.players.phone}
+                    />
                   </div>
+                </div>
+                {/* Mobile status badges */}
+                <div className="mt-2 flex flex-wrap gap-2 sm:hidden">
+                  {tp.waiver_signed ? (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Waiver Signed
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      Waiver Pending
+                    </span>
+                  )}
+                  {tp.lunch_choice ? (
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      tp.lunch_choice === 'veg'
+                        ? 'bg-green-100 text-green-800'
+                        : tp.lunch_choice === 'non-veg'
+                        ? 'bg-orange-100 text-orange-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {tp.lunch_choice === 'veg' ? 'Veg' : tp.lunch_choice === 'non-veg' ? 'Non-Veg' : 'No Lunch'}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      Lunch Pending
+                    </span>
+                  )}
                 </div>
                 {(!tp.waiver_signed || !tp.lunch_choice) && (
                   <p className="mt-2 text-xs text-yellow-600">
