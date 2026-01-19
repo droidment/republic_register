@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { formatPhone, formatDateTime } from '@/lib/utils'
 import DeleteTeamButton from './DeleteTeamButton'
+import TeamActions from './TeamActions'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -168,6 +169,14 @@ export default async function TeamDetailPage({ params }: PageProps) {
           </div>
         </div>
       </div>
+
+      {/* Quick Actions - Send Invites & Reminders */}
+      <TeamActions
+        teamId={team.id}
+        teamName={team.name}
+        inviteLink={inviteLink}
+        teamPlayers={team.team_players}
+      />
 
       {/* Player Roster */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">

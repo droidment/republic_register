@@ -157,12 +157,15 @@ export default async function RosterPage() {
                         </span>
                       )}
                     </div>
-                    {/* Player Actions */}
+                    {/* Player Actions - only shown for players who haven't completed waiver/food */}
                     <PlayerActions
                       teamPlayerId={tp.id}
                       playerId={tp.players.id}
                       playerName={tp.players.name}
                       playerPhone={tp.players.phone}
+                      playerEmail={tp.players.email}
+                      waiverSigned={tp.waiver_signed}
+                      lunchChoice={tp.lunch_choice}
                     />
                   </div>
                 </div>

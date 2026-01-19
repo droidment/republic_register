@@ -9,22 +9,32 @@ interface PlayerActionsProps {
   playerId: string
   playerName: string
   playerPhone: string
+  playerEmail: string
+  waiverSigned: boolean
+  lunchChoice: string | null
 }
 
 export default function PlayerActions({
   teamPlayerId,
   playerId,
   playerName,
-  playerPhone
+  playerPhone,
+  playerEmail,
+  waiverSigned,
+  lunchChoice
 }: PlayerActionsProps) {
+  // Captain can only edit/delete players who haven't completed waiver AND lunch selection
+  const canModify = !waiverSigned && !lunchChoice
   const [showEditModal, setShowEditModal] = useState(false)
   const [showRemoveModal, setShowRemoveModal] = useState(false)
+  const [name, setName] = useState(playerName)
+  const [email, setEmail] = useState(playerEmail)
   const [phone, setPhone] = useState(playerPhone)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  async function handleUpdatePhone(e: React.FormEvent) {
+  async function handleUpdatePlayer(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
@@ -34,7 +44,11 @@ export default function PlayerActions({
 
     const { error: updateError } = await supabase
       .from('players')
-      .update({ phone: normalizedPhone })
+      .update({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        phone: normalizedPhone
+      })
       .eq('id', playerId)
 
     if (updateError) {
@@ -90,6 +104,11 @@ export default function PlayerActions({
     }
   }
 
+  // If player has completed waiver or lunch, don't show action buttons
+  if (!canModify) {
+    return null
+  }
+
   return (
     <>
       {/* Action Buttons */}
@@ -97,7 +116,7 @@ export default function PlayerActions({
         <button
           onClick={() => setShowEditModal(true)}
           className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-          title="Edit phone number"
+          title="Edit player details"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -114,15 +133,15 @@ export default function PlayerActions({
         </button>
       </div>
 
-      {/* Edit Phone Modal */}
+      {/* Edit Player Modal */}
       {showEditModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Edit Phone Number
+              Edit Player Details
             </h3>
             <p className="text-sm text-gray-600 mb-4">
-              Update phone number for <strong>{playerName}</strong>
+              Update information for this player. Changes can only be made before they complete their waiver and food selection.
             </p>
 
             {error && (
@@ -131,13 +150,43 @@ export default function PlayerActions({
               </div>
             )}
 
-            <form onSubmit={handleUpdatePhone} className="space-y-4">
+            <form onSubmit={handleUpdatePlayer} className="space-y-4">
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="edit-name" className="block text-sm font-medium text-gray-700">
+                  Name
+                </label>
+                <input
+                  id="edit-name"
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-400 bg-white"
+                  placeholder="John Doe"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="edit-email" className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <input
+                  id="edit-email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-400 bg-white"
+                  placeholder="john@example.com"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="edit-phone" className="block text-sm font-medium text-gray-700">
                   Phone Number
                 </label>
                 <input
-                  id="phone"
+                  id="edit-phone"
                   type="tel"
                   required
                   value={phone}
@@ -152,6 +201,8 @@ export default function PlayerActions({
                   type="button"
                   onClick={() => {
                     setShowEditModal(false)
+                    setName(playerName)
+                    setEmail(playerEmail)
                     setPhone(playerPhone)
                     setError(null)
                   }}
@@ -182,9 +233,6 @@ export default function PlayerActions({
             </h3>
             <p className="text-sm text-gray-600 mb-4">
               Are you sure you want to remove <strong>{playerName}</strong> from your team?
-            </p>
-            <p className="text-sm text-yellow-600 mb-4">
-              This will remove their waiver signature and lunch selection for this team.
             </p>
 
             {error && (

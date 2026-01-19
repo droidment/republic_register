@@ -39,6 +39,7 @@ export default function PlayerRegistrationForm({
   // Waiver
   const [waiverAccepted, setWaiverAccepted] = useState(false)
   const [signature, setSignature] = useState<string | null>(null)
+  const [typedSignature, setTypedSignature] = useState('')
 
   // Lunch
   const [lunchChoice, setLunchChoice] = useState<'veg' | 'non-veg' | 'none' | null>(null)
@@ -183,6 +184,12 @@ export default function PlayerRegistrationForm({
       return
     }
 
+    // Validate typed signature matches the player's name (case-insensitive)
+    if (typedSignature.trim().toLowerCase() !== name.trim().toLowerCase()) {
+      setError('Your typed signature must match your full name exactly.')
+      return
+    }
+
     setLoading(true)
     setError(null)
 
@@ -192,12 +199,18 @@ export default function PlayerRegistrationForm({
     // For now, we'll store a placeholder URL
     const signatureUrl = 'signed' // In production: upload and get URL
 
+    // Collect evidence metadata
+    const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown'
+
     const { error: updateError } = await supabase
       .from('team_players')
       .update({
         waiver_signed: true,
         waiver_signed_at: new Date().toISOString(),
         signature_url: signatureUrl,
+        typed_signature: typedSignature.trim(),
+        user_agent: userAgent,
+        waiver_version: 1, // Current waiver version
       })
       .eq('id', teamPlayerId)
 
@@ -427,7 +440,30 @@ export default function PlayerRegistrationForm({
               </label>
             </div>
 
-            {/* Signature */}
+            {/* Typed Signature Confirmation */}
+            <div>
+              <label htmlFor="typed-signature" className="block text-sm font-medium text-gray-700 mb-1">
+                Type Your Full Name to Confirm *
+              </label>
+              <p className="text-xs text-gray-500 mb-2">
+                By typing your name below, you confirm that you are "{name}" and agree to this waiver.
+              </p>
+              <input
+                id="typed-signature"
+                type="text"
+                required
+                value={typedSignature}
+                onChange={(e) => setTypedSignature(e.target.value)}
+                disabled={!waiverAccepted}
+                className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-400 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                placeholder={`Type "${name}" here`}
+              />
+              {typedSignature && typedSignature.trim().toLowerCase() !== name.trim().toLowerCase() && (
+                <p className="mt-1 text-xs text-red-600">Name must match exactly: "{name}"</p>
+              )}
+            </div>
+
+            {/* Drawn Signature */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Your Signature *
@@ -437,7 +473,7 @@ export default function PlayerRegistrationForm({
 
             <button
               type="submit"
-              disabled={loading || !waiverAccepted || !signature}
+              disabled={loading || !waiverAccepted || !signature || typedSignature.trim().toLowerCase() !== name.trim().toLowerCase()}
               className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Saving...' : 'Sign and Continue'}
