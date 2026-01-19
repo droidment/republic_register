@@ -94,7 +94,7 @@ export default function NewTeamPage() {
               required
               value={leagueId}
               onChange={(e) => setLeagueId(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder:text-gray-400 bg-white"
             >
               {leagues.map((league) => (
                 <option key={league.id} value={league.id}>
@@ -114,7 +114,7 @@ export default function NewTeamPage() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder:text-gray-400 bg-white"
               placeholder="e.g., Thunder Spikes"
             />
           </div>
@@ -133,7 +133,7 @@ export default function NewTeamPage() {
               required
               value={captainName}
               onChange={(e) => setCaptainName(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder:text-gray-400 bg-white"
               placeholder="e.g., John Smith"
             />
           </div>
@@ -148,7 +148,7 @@ export default function NewTeamPage() {
               required
               value={captainEmail}
               onChange={(e) => setCaptainEmail(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder:text-gray-400 bg-white"
               placeholder="e.g., captain@example.com"
             />
             <p className="mt-1 text-xs text-gray-500">
@@ -165,7 +165,7 @@ export default function NewTeamPage() {
               type="tel"
               value={captainPhone}
               onChange={(e) => setCaptainPhone(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder:text-gray-400 bg-white"
               placeholder="e.g., +1 234 567 8900"
             />
             <p className="mt-1 text-xs text-gray-500">
